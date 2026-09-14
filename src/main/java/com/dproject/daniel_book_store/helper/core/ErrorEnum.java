@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 
 @Getter
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public enum ErrorEnum {
     SUCCESS_RESPONSE("SCSS-BS-00", "Success", HttpStatus.OK),
     ERROR_NOT_FOUNT("ERR-BS-NF-00", "Book Not Found", HttpStatus.NOT_FOUND),
@@ -19,10 +19,10 @@ public enum ErrorEnum {
     private final String messageEnglish;
     private final HttpStatus httpStatus;
 
-    ErrorEnum(String errorCode, String messageEnglish, HttpStatus httpStatus) {
-        this.errorCode = errorCode;
-        this.messageEnglish = messageEnglish;
-        this.httpStatus = httpStatus;
-    }
+//    ErrorEnum(String errorCode, String messageEnglish, HttpStatus httpStatus) {
+//        this.errorCode = errorCode;
+//        this.messageEnglish = messageEnglish;
+//        this.httpStatus = httpStatus;
+//    }
 
 }

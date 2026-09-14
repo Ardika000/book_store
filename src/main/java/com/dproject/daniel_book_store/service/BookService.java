@@ -9,6 +9,7 @@ import com.dproject.daniel_book_store.repository.ActivityLogRepository;
 import com.dproject.daniel_book_store.repository.BookRepository;
 import com.dproject.daniel_book_store.dto.request.BookRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
@@ -26,16 +27,21 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookService {
     private final BookRepository bookRepository;
     private final ActivityLogRepository logRepo;
 
     public Page<Book> getAllDataBook(LocalDate minDate, LocalDate maxDate, int page, int size, String sortBy) {
+        log.info("Fetching books with date filter: minDate={}, maxDate={}", minDate, maxDate);
         LocalDateTime start = (minDate != null) ? minDate.atStartOfDay() : null;
         LocalDateTime end = (maxDate != null) ? maxDate.atTime(LocalTime.MAX):null;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return bookRepository.filterByDateRange(start, end, pageable);
-//        return bookRepository.findAll();
+
+        var result = bookRepository.filterByDateRange(start, end, pageable);
+        log.info("SUccessfully fetched {} booksfrom database", result.getSize());
+
+        return result;
     }
 
     public List<Book> getByNameAndAuthor(String bookName, String author) {
@@ -49,19 +55,6 @@ public class BookService {
     public List<Book> getByBook(String bookName) {
         return bookRepository.findByBookName(bookName);
     }
-
-//    public ResponseEntity<List<Book>> addBook(String bookName, String author, BigDecimal price) {
-//        Book bookNew = new Book();
-//        bookNew.setBookName(bookName);
-//        bookNew.setAuthor(author);
-//        bookNew.setPrice(price);
-//        bookNew.setCreate_date(LocalDateTime.now());
-//        bookNew.setUpdate_date(LocalDateTime.now());
-//
-//        bookRepository.save(bookNew);
-//
-//        return new ResponseEntity<>(bookRepository.findAll(), HttpStatus.OK);
-//    }
 
     public List<Book> addBook(BookRequest book) {
         Book bookNew = new Book();
@@ -127,7 +120,11 @@ public class BookService {
     }
 
     public Book getBookById(String id) {
+        log.info("Searching for book with ID {}", id);
         return bookRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorEnum.ERROR_NOT_FOUNT));
+                .orElseThrow(() -> {
+                    log.warn("Book Search failed. ID not found: {}", id);
+                    return new CustomException(ErrorEnum.ERROR_NOT_FOUNT);
+                });
     }
 }
