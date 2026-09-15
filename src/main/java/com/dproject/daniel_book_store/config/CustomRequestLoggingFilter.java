@@ -32,14 +32,6 @@ public class CustomRequestLoggingFilter extends AbstractRequestLoggingFilter {
 
     @Override
     protected void beforeRequest(HttpServletRequest request, String message) {
-        String traceID = request.getHeader("X-Trace-Id");
-        if(traceID == null || traceID.isEmpty()){
-            traceID = UUID.randomUUID().toString().replace("-", "").substring(0,16);
-        }
-        String spanID = UUID.randomUUID().toString().replace("-", "").substring(0,16);
-        MDC.put("traceId", traceID);
-        MDC.put("spanId", spanID);
-
         StopWatch sw = new StopWatch();
         sw.start();
 
