@@ -45,7 +45,10 @@ public class BookService {
     }
 
     public List<Book> getByNameAndAuthor(String bookName, String author) {
-        return bookRepository.findByBookNameAndAuthor(bookName, author);
+        log.info("Fetching books with data: bookName={}, author={} ", bookName, author);
+        var res = bookRepository.findByBookNameAndAuthor(bookName, author);
+        log.info("SUccessfully fetched {} booksfrom database", res);
+        return res;
     }
 
     public List<Book> getByAuthor(String author) {
