@@ -1,4 +1,4 @@
-package com.dproject.daniel_book_store.helper;
+package com.dproject.daniel_book_store.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
