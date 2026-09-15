@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.UUID;
 
-@Component
+//@Component
 @Slf4j
 public class RequestPerformenceFilter extends OncePerRequestFilter {
 

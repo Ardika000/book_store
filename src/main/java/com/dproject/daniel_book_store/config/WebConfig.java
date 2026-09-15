@@ -4,9 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
-@Configuration
+//@Configuration
 public class WebConfig {
-    @Bean
+//    @Bean
     public CommonsRequestLoggingFilter loggingFilter(){
         CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
         filter.setIncludeQueryString(true);
