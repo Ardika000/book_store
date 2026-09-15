@@ -5,11 +5,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -24,6 +26,12 @@ public class RequestPerformenceFilter extends OncePerRequestFilter {
         String method = request.getMethod();
 
         try {
+            String traceID = request.getHeader("X-Trace-Id");
+            if(traceID == null || traceID.isEmpty()){
+                traceID = UUID.randomUUID().toString().replace("-", "");
+            }
+            MDC.put("traceId", traceID);
+
             filterChain.doFilter(request, response);
         }finally {
             sw.stop();
@@ -40,5 +48,6 @@ public class RequestPerformenceFilter extends OncePerRequestFilter {
                 log.info("HTTP: {} {} | Status: {} | Execution Time: {} ms", method, uri, status, excutionTime);
             }
         }
+        MDC.clear();
     }
 }
