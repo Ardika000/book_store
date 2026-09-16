@@ -5,6 +5,7 @@ import com.dproject.daniel_book_store.helper.core.OutputSchema;
 import com.dproject.daniel_book_store.model.Book;
 import com.dproject.daniel_book_store.dto.request.BookRequest;
 import com.dproject.daniel_book_store.service.BookService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -67,12 +68,12 @@ public class BookController {
 //    }
 
     @PostMapping("/insert-book")
-    public ResponseEntity<OutputSchema<List<Book>>> insertData(@RequestBody BookRequest bookReq){
+    public ResponseEntity<OutputSchema<List<Book>>> insertData(@RequestBody @Valid BookRequest bookReq){
         return ResponseEntity.ok(OutputSchema.success(bookService.addBook(bookReq), "Successfully insert data"));
     }
 
     @PostMapping("/update-book/{id}")
-    public ResponseEntity<OutputSchema<UpdateBookHelper>> updateData(@PathVariable String id , @RequestBody BookRequest bookRequest){
+    public ResponseEntity<OutputSchema<UpdateBookHelper>> updateData(@PathVariable String id , @RequestBody @Valid BookRequest bookRequest){
         return ResponseEntity.ok(OutputSchema.success(bookService.editBook(id, bookRequest), "Successfully update data"));
     }
 

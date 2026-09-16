@@ -30,7 +30,7 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="com.dproject.daniel_book_store" level="INFO" additivity="false">
+    <logger name="com.dproject.daniel_book_store" level="DEBUG" additivity="false">
         <appender-ref ref="Console" />
         <appender-ref ref="RollingFile" />
     </logger>

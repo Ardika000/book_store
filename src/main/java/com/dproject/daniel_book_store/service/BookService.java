@@ -33,7 +33,7 @@ public class BookService {
     private final ActivityLogRepository logRepo;
 
     public Page<Book> getAllDataBook(LocalDate minDate, LocalDate maxDate, int page, int size, String sortBy) {
-        log.info("Fetching books with date filter: minDate={}, maxDate={}", minDate, maxDate);
+        log.info("Fetching books with date filter: minDate={}, maxDate={}, size={}, sortBy={}", minDate, maxDate, size, sortBy);
         LocalDateTime start = (minDate != null) ? minDate.atStartOfDay() : null;
         LocalDateTime end = (maxDate != null) ? maxDate.atTime(LocalTime.MAX):null;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
