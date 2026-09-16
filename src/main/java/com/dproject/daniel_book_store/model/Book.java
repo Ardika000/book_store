@@ -1,14 +1,19 @@
 package com.dproject.daniel_book_store.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
 @Entity
+@Getter
+@Setter
 @Table(name = "Book")
 public class Book {
     @Id
@@ -29,5 +34,11 @@ public class Book {
     private BigDecimal price;
     private LocalDateTime create_date;
     private LocalDateTime update_date;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    @JsonIgnore
+    @ToString.Exclude
+    private Category category;
 
 }
