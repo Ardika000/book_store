@@ -1,5 +1,6 @@
 package com.dproject.daniel_book_store.controller;
 
+import com.dproject.daniel_book_store.dto.projection.BookProjection;
 import com.dproject.daniel_book_store.helper.UpdateBookHelper;
 import com.dproject.daniel_book_store.helper.core.OutputSchema;
 import com.dproject.daniel_book_store.model.Book;
@@ -23,7 +24,7 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping("/book")
-    public ResponseEntity<OutputSchema<Page<Book>>> getAllBookData(
+    public ResponseEntity<OutputSchema<Page<BookProjection>>> getAllBookData(
             @RequestParam(required = false, defaultValue = "") LocalDate minDate,
             @RequestParam(required = false, defaultValue = "") LocalDate maxDate,
             @RequestParam(required = false, defaultValue = "0") int page,
@@ -48,7 +49,7 @@ public class BookController {
 //    }
 
     @GetMapping("/getBook/{book_name}")
-    public ResponseEntity<OutputSchema<List<Book>>> getByBook(@PathVariable String book_name){
+    public ResponseEntity<OutputSchema<List<BookProjection>>> getByBook(@PathVariable String book_name){
         return ResponseEntity.ok(OutputSchema.success(bookService.getByBook(book_name),"Success get book by name"));
     }
 

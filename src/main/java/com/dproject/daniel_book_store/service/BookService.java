@@ -1,5 +1,6 @@
 package com.dproject.daniel_book_store.service;
 
+import com.dproject.daniel_book_store.dto.projection.BookProjection;
 import com.dproject.daniel_book_store.helper.UpdateBookHelper;
 import com.dproject.daniel_book_store.helper.exception.CustomException;
 import com.dproject.daniel_book_store.helper.core.ErrorEnum;
@@ -32,7 +33,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final ActivityLogRepository logRepo;
 
-    public Page<Book> getAllDataBook(LocalDate minDate, LocalDate maxDate, int page, int size, String sortBy) {
+    public Page<BookProjection> getAllDataBook(LocalDate minDate, LocalDate maxDate, int page, int size, String sortBy) {
         log.info("Fetching books with date filter: minDate={}, maxDate={}, size={}, sortBy={}", minDate, maxDate, size, sortBy);
         LocalDateTime start = (minDate != null) ? minDate.atStartOfDay() : null;
         LocalDateTime end = (maxDate != null) ? maxDate.atTime(LocalTime.MAX):null;
@@ -59,7 +60,7 @@ public class BookService {
         return res;
     }
 
-    public List<Book> getByBook(String bookName) {
+    public List<BookProjection> getByBook(String bookName) {
         var res = bookRepository.findByBookName(bookName);
         log.debug("Number of fetched data {}", res.size());
         log.info("Successfully get all data by author");
@@ -71,9 +72,12 @@ public class BookService {
 
         var bookNameExisted = bookRepository.findByBookName(book.getBookName());
         var bookAuthorExisted = bookRepository.findByAuthor(book.getAuthor());
+        var isExist = false;
+        if(!bookNameExisted.isEmpty() && !bookAuthorExisted.isEmpty())
+            isExist = true;
 
-        log.debug("Book name: {}, is exist: {}", book.getBookName(), bookNameExisted);
-        log.debug("Book author: {}, is exist: {}", book.getAuthor(), bookAuthorExisted);
+        log.debug("Book name: {}, is exist: {}", book.getBookName(), isExist);
+        log.debug("Book author: {}, is exist: {}", book.getAuthor(), isExist);
 
         if(!bookNameExisted.isEmpty() && !bookAuthorExisted.isEmpty())
             throw new CustomException(ErrorEnum.DUPLICATE_DATA);

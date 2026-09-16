@@ -5,10 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//@Data
-//@Builder
-//@AllArgsConstructor
-//@NoArgsConstructor
-public class BookProjection {
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.security.PrivateKey;
 
+
+public interface BookProjection {
+    String getId();
+    String getBookName();
+    String getAuthor();
+    BigDecimal getPrice();
 }
