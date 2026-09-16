@@ -52,7 +52,7 @@ public class CustomRequestLoggingFilter extends AbstractRequestLoggingFilter {
 
             log.debug(message);
             log.info("Execution Time: {} ms", executionTime);
-            log.info("== Final {} {} ==", request.getMethod(), request.getRequestURI());
+            log.info("== Finish {} {} ==", request.getMethod(), request.getRequestURI());
         }finally {
             MDC.clear();
         }

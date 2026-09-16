@@ -39,27 +39,45 @@ public class BookService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 
         var result = bookRepository.filterByDateRange(start, end, pageable);
-        log.info("SUccessfully fetched {} booksfrom database", result.getSize());
-
+        log.debug("Number of fetched data {}", result.getSize());
+        log.info("Successfully get all data");
         return result;
     }
 
     public List<Book> getByNameAndAuthor(String bookName, String author) {
         log.info("Fetching books with data: bookName={}, author={} ", bookName, author);
         var res = bookRepository.findByBookNameAndAuthor(bookName, author);
-        log.info("SUccessfully fetched {} booksfrom database", res);
+        log.debug("Number of fetched data {}", res.size());
+        log.info("Successfully get all data by name & author");
         return res;
     }
 
     public List<Book> getByAuthor(String author) {
-        return bookRepository.findByAuthor(author);
+        var res = bookRepository.findByAuthor(author);
+        log.debug("Number of fetched data {}", res.size());
+        log.info("Successfully get all data by author");
+        return res;
     }
 
     public List<Book> getByBook(String bookName) {
-        return bookRepository.findByBookName(bookName);
+        var res = bookRepository.findByBookName(bookName);
+        log.debug("Number of fetched data {}", res.size());
+        log.info("Successfully get all data by author");
+        return res;
     }
 
     public List<Book> addBook(BookRequest book) {
+        log.info("Starting insert new book data");
+
+        var bookNameExisted = bookRepository.findByBookName(book.getBookName());
+        var bookAuthorExisted = bookRepository.findByAuthor(book.getAuthor());
+
+        log.debug("Book name: {}, is exist: {}", book.getBookName(), bookNameExisted);
+        log.debug("Book author: {}, is exist: {}", book.getAuthor(), bookAuthorExisted);
+
+        if(!bookNameExisted.isEmpty() && !bookAuthorExisted.isEmpty())
+            throw new CustomException(ErrorEnum.DUPLICATE_DATA);
+
         Book bookNew = new Book();
         bookNew.setBookName(book.getBookName());
         bookNew.setAuthor(book.getAuthor());
@@ -67,23 +85,29 @@ public class BookService {
         bookNew.setCreate_date(LocalDateTime.now());
         bookNew.setUpdate_date(LocalDateTime.now());
 
+        log.debug("Inserting new book data: {}", bookNew);
         // saving data
         Book dataCreated = bookRepository.save(bookNew);
+        log.info("Finish inserting book data");
 
         // looging save
+        log.info("Starting saving data to activity log");
         ActivityLog logInsert = new ActivityLog();
         logInsert.setBookNameNew(dataCreated.getBookName());
         logInsert.setActivity("insert data");
         logInsert.setAuthorNew(dataCreated.getAuthor());
         logInsert.setPriceNew(dataCreated.getPrice());
         logInsert.setCreateDate(LocalDateTime.now());
-        logRepo.save(logInsert);
 
+        log.debug("Inserting data insert to activity log : {}", logInsert);
+        logRepo.save(logInsert);
+        log.info("Finish inserting data insert to activity log");
         return bookRepository.findAll();
     }
 
 
     public UpdateBookHelper editBook(String id, BookRequest bookRequest) {
+        log.info("Starting editing book data");
         Book bookEdit = bookRepository.findById(id).orElseThrow(()-> new CustomException(ErrorEnum.ERROR_NOT_FOUNT));
         var bookTemp = new Book();
         BeanUtils.copyProperties(bookEdit,bookTemp);
@@ -92,11 +116,14 @@ public class BookService {
         bookEdit.setPrice(bookRequest.getPrice());
         bookEdit.setUpdate_date(LocalDateTime.now());
 
+        log.debug("Book data to update: {}", bookEdit);
         // save data
         Book newBook =  bookRepository.save(bookEdit);
+        log.info("Finish inserting book data");
         UpdateBookHelper newOldData = new UpdateBookHelper(bookTemp, newBook);
 
         // looging
+        log.info("Starting saving data to activity log");
         ActivityLog logInsert = new ActivityLog();
         logInsert.setActivity("update data");
         logInsert.setBookNameOld(newOldData.getOldBook().getBookName());
@@ -106,19 +133,23 @@ public class BookService {
         logInsert.setPriceOld(newOldData.getOldBook().getPrice());
         logInsert.setPriceNew(newOldData.getNewBook().getPrice());
         logInsert.setCreateDate(LocalDateTime.now());
+        log.debug("Inserting data update to activity log : {}", logInsert);
         logRepo.save(logInsert);
-
+        log.info("Finish inserting data update to activity log");
         return newOldData;
     }
 
     public Book deleteBook(String id) {
+        log.info("Starting deleting book data");
         Book getBookSelected = bookRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorEnum.ERROR_NOT_FOUNT));
 
         Book tempBook = new Book();
         BeanUtils.copyProperties(getBookSelected, tempBook);
+        log.debug("Book data to be deleted: {}", tempBook);
 
         bookRepository.deleteById(id);
+        log.info("Finish deleting book data");
         return tempBook;
     }
 
