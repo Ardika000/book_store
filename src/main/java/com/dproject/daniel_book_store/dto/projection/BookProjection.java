@@ -6,13 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.security.PrivateKey;
 
-
-public interface BookProjection {
-    String getId();
-    String getBookName();
-    String getAuthor();
-    BigDecimal getPrice();
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class BookProjection {
+    private String bookId;
+    private String bookName;
+    private String author;
+    private BigDecimal price;
+    private String categoryId;
+    private String categoryName;
 }

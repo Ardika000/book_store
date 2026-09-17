@@ -9,6 +9,7 @@ import com.dproject.daniel_book_store.model.Book;
 import com.dproject.daniel_book_store.repository.ActivityLogRepository;
 import com.dproject.daniel_book_store.repository.BookRepository;
 import com.dproject.daniel_book_store.dto.request.BookRequest;
+import com.dproject.daniel_book_store.service.helper.QueryKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -164,5 +165,35 @@ public class BookService {
                     log.warn("Book Search failed. ID not found: {}", id);
                     return new CustomException(ErrorEnum.ERROR_NOT_FOUNT);
                 });
+    }
+
+    public List<BookProjection> getAllBookWithCategory() {
+        log.info("Starting get data book with category");
+
+        var res = bookRepository.findAllBookWithCategory();
+        log.debug("Fetched data book : {}", res.size());
+
+        log.info("Finish get data book with category");
+        return res;
+    }
+
+    public List<BookProjection> getBookCatByAuthor(String author) {
+        log.info("Starting get data book with category by author");
+
+        var res = bookRepository.findBookWithCategoryByAuthor(author);
+        log.debug("Fetched data book : {}", res.size());
+
+        log.info("Finish get data book with category by author");
+        return res;
+    }
+
+    public List<BookProjection> getSearchDynamic(QueryKey key, String value) {
+        log.info("Starting get data book category dynamic method");
+
+        var res = bookRepository.findBookDynamic(key, value);
+        log.debug("Fetched data book : {}", res.size());
+
+        log.info("Finish get data book with category dynamic method");
+        return res;
     }
 }

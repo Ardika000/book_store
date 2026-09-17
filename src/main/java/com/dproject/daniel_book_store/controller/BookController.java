@@ -6,6 +6,7 @@ import com.dproject.daniel_book_store.helper.core.OutputSchema;
 import com.dproject.daniel_book_store.model.Book;
 import com.dproject.daniel_book_store.dto.request.BookRequest;
 import com.dproject.daniel_book_store.service.BookService;
+import com.dproject.daniel_book_store.service.helper.QueryKey;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -81,5 +82,24 @@ public class BookController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<OutputSchema<Book>> deleteData(@PathVariable String id){
         return ResponseEntity.ok(OutputSchema.success(bookService.deleteBook(id),"Successfully delete data"));
+    }
+
+    @GetMapping("/book-with-category")
+    public ResponseEntity<OutputSchema<List<BookProjection>>> getBooksWithCategory(){
+        List<BookProjection> result = bookService.getAllBookWithCategory();
+        return ResponseEntity.ok(OutputSchema.success(result, "Successfully show book with category"));
+    }
+
+    @GetMapping("/book-with-category-by-author")
+    public ResponseEntity<OutputSchema<List<BookProjection>>> getBooksWithCategoryByAuthor(@RequestParam String author){
+        return ResponseEntity.ok(OutputSchema.success(bookService.getBookCatByAuthor(author), "Successfully find book and category by author"));
+    }
+
+    @GetMapping("/dynamic-bookCat")
+    public ResponseEntity<OutputSchema<List<BookProjection>>> getBookByCatDynamic(
+            @RequestParam(required = false) QueryKey key,
+            @RequestParam(required = false) String value)
+    {
+        return ResponseEntity.ok(OutputSchema.success(bookService.getSearchDynamic(key, value), "Successfully show book with category dynamic"));
     }
 }
