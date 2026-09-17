@@ -1,15 +1,19 @@
 package com.dproject.daniel_book_store.service;
 
+import com.dproject.daniel_book_store.dto.output.BookCategoryOutput;
 import com.dproject.daniel_book_store.dto.projection.BookProjection;
 import com.dproject.daniel_book_store.helper.UpdateBookHelper;
 import com.dproject.daniel_book_store.helper.exception.CustomException;
 import com.dproject.daniel_book_store.helper.core.ErrorEnum;
 import com.dproject.daniel_book_store.model.ActivityLog;
 import com.dproject.daniel_book_store.model.Book;
+import com.dproject.daniel_book_store.model.Category;
 import com.dproject.daniel_book_store.repository.ActivityLogRepository;
 import com.dproject.daniel_book_store.repository.BookRepository;
 import com.dproject.daniel_book_store.dto.request.BookRequest;
+import com.dproject.daniel_book_store.repository.CategoryRepository;
 import com.dproject.daniel_book_store.service.helper.QueryKey;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +37,7 @@ import java.util.List;
 public class BookService {
     private final BookRepository bookRepository;
     private final ActivityLogRepository logRepo;
+    private final CategoryRepository categoryRepository;
 
     public Page<BookProjection> getAllDataBook(LocalDate minDate, LocalDate maxDate, int page, int size, String sortBy) {
         log.info("Fetching books with date filter: minDate={}, maxDate={}, size={}, sortBy={}", minDate, maxDate, size, sortBy);

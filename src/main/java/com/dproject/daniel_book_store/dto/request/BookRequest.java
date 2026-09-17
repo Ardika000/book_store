@@ -1,5 +1,6 @@
 package com.dproject.daniel_book_store.dto.request;
 
+import com.dproject.daniel_book_store.model.Category;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -19,4 +20,6 @@ public class BookRequest {
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
     private BigDecimal price;
 
+    @NotBlank(message = "Category ID is needed")
+    private String categoryId;
 }

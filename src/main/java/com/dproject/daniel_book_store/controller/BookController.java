@@ -1,5 +1,7 @@
 package com.dproject.daniel_book_store.controller;
 
+import com.dproject.daniel_book_store.dto.output.BookCategoryOutput;
+import com.dproject.daniel_book_store.dto.output.UpdateBookOutput;
 import com.dproject.daniel_book_store.dto.projection.BookProjection;
 import com.dproject.daniel_book_store.helper.UpdateBookHelper;
 import com.dproject.daniel_book_store.helper.core.OutputSchema;
@@ -7,6 +9,7 @@ import com.dproject.daniel_book_store.model.Book;
 import com.dproject.daniel_book_store.dto.request.BookRequest;
 import com.dproject.daniel_book_store.service.BookService;
 import com.dproject.daniel_book_store.service.helper.QueryKey;
+import com.dproject.daniel_book_store.service.manager.BookServiceManager;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +26,7 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
+    private final BookServiceManager bookServiceManager;
 
     @GetMapping("/book")
     public ResponseEntity<OutputSchema<Page<BookProjection>>> getAllBookData(
@@ -65,18 +69,24 @@ public class BookController {
     }
 
 //    @PostMapping("/insert-book")
-//    public ResponseEntity<List<Book>> insertData(@RequestBody String book_name, @RequestBody String author, @RequestBody BigDecimal price){
-//        return bookService.addBook(book_name, author, price);
+//    public ResponseEntity<OutputSchema<List<Book>>> insertData(@RequestBody @Valid BookRequest bookReq){
+//        return ResponseEntity.ok(OutputSchema.success(bookService.addBook(bookReq), "Successfully insert data"));
 //    }
 
-    @PostMapping("/insert-book")
-    public ResponseEntity<OutputSchema<List<Book>>> insertData(@RequestBody @Valid BookRequest bookReq){
-        return ResponseEntity.ok(OutputSchema.success(bookService.addBook(bookReq), "Successfully insert data"));
+    @PostMapping("/insertBookCat")
+    public ResponseEntity<OutputSchema<BookCategoryOutput>> createBook(@Valid @RequestBody BookRequest request) {
+        BookCategoryOutput response = bookServiceManager.createBookCategory(request);
+        return ResponseEntity.ok(OutputSchema.success(response, "Successfully created new book with category"));
     }
 
-    @PostMapping("/update-book/{id}")
-    public ResponseEntity<OutputSchema<UpdateBookHelper>> updateData(@PathVariable String id , @RequestBody @Valid BookRequest bookRequest){
-        return ResponseEntity.ok(OutputSchema.success(bookService.editBook(id, bookRequest), "Successfully update data"));
+//    @PostMapping("/update-book/{id}")
+//    public ResponseEntity<OutputSchema<UpdateBookHelper>> updateData(@PathVariable String id , @RequestBody @Valid BookRequest bookRequest){
+//        return ResponseEntity.ok(OutputSchema.success(bookService.editBook(id, bookRequest), "Successfully update data"));
+//    }
+
+    @PutMapping("updateBookCat/{id}")
+    public ResponseEntity<OutputSchema<UpdateBookOutput>> updateData(@PathVariable String id , @RequestBody @Valid BookRequest bookRequest){
+        return ResponseEntity.ok(OutputSchema.success(bookServiceManager.updateBookCategory(id, bookRequest), "Successfully update data"));
     }
 
     @DeleteMapping("/delete/{id}")
