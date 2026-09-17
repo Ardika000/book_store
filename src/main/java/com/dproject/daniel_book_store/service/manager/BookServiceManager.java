@@ -2,6 +2,7 @@ package com.dproject.daniel_book_store.service.manager;
 
 import com.dproject.daniel_book_store.dto.output.BookCategoryOutput;
 import com.dproject.daniel_book_store.dto.output.UpdateBookOutput;
+import com.dproject.daniel_book_store.dto.projection.BookProjection;
 import com.dproject.daniel_book_store.dto.request.BookRequest;
 import com.dproject.daniel_book_store.helper.UpdateBookHelper;
 import com.dproject.daniel_book_store.helper.core.ErrorEnum;
@@ -141,5 +142,26 @@ public class BookServiceManager {
                 .oldData(oldDataDto)
                 .newData(newDataDto)
                 .build();
+    }
+
+    @Transactional
+    public BookProjection deleteBook(String id) {
+        log.info("Starting Delete book");
+        Book book = bookRepository.findById(id)
+                .orElseThrow(()-> new CustomException(ErrorEnum.ERROR_NOT_FOUNT));
+
+        BookProjection deleteData = BookProjection.builder()
+                .bookId(book.getId())
+                .bookName(book.getBookName())
+                .author(book.getAuthor())
+                .price(book.getPrice())
+                .categoryId(book.getCategory().getId())
+                .categoryName(book.getCategory().getName())
+                .build();
+
+        log.debug("fetch book will be deleted : {}", deleteData);
+        bookRepository.deleteById(id);
+        log.info("Finish deleting book data");
+        return deleteData;
     }
 }

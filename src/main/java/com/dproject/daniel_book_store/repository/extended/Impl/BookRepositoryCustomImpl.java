@@ -7,13 +7,18 @@ import com.dproject.daniel_book_store.service.helper.QueryKey;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,21 +67,37 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
     }
 
     @Override
-    public List<BookProjection> findBookDynamic(QueryKey key, String value) {
+    public Page<BookProjection> findBookDynamic(QueryKey key, String value, LocalDate minDate, LocalDate maxDate, Pageable pageable) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<BookProjection> query = builder.createQuery(BookProjection.class);
         Root<Book> bookProjectionRoot = query.from(Book.class);
 
+        List<Predicate> predicates = new ArrayList<>();
+
         var joinedBookCategory = bookProjectionRoot.join("category", JoinType.LEFT);
         if(Objects.nonNull(key)){
             switch (key){
-                case CATEGORYID -> query.where(builder.equal(joinedBookCategory.get("categoryId"), value));
-                case AUTHOR_NAME -> query.where(builder.equal(bookProjectionRoot.get("author"), value));
-                case BOOK_NAME -> query.where(builder.equal(bookProjectionRoot.get("bookName"), value));
-                default -> query.where();
+                case CATEGORYID -> predicates.add(builder.equal(joinedBookCategory.get("categoryId"), value));
+                case AUTHOR_NAME -> predicates.add(builder.equal(bookProjectionRoot.get("author"), value));
+                case BOOK_NAME -> predicates.add(builder.equal(bookProjectionRoot.get("bookName"), value));
+//                default -> query.where();
             }
         }
+
+        // rentang tanggal
+        if(Objects.nonNull(minDate)){
+            LocalDateTime startDate = minDate.atStartOfDay();
+            predicates.add(builder.greaterThanOrEqualTo(bookProjectionRoot.get("create_date"), startDate));
+        }
+
+        if(Objects.nonNull(maxDate)){
+            LocalDateTime startDate = maxDate.atTime(LocalTime.MAX);
+            predicates.add(builder.lessThanOrEqualTo(bookProjectionRoot.get("create_date"), startDate));
+        }
+
+        if(!predicates.isEmpty())
+            query.where(predicates.toArray(new Predicate[0]));
 
         query.multiselect(
                 bookProjectionRoot.get("id"),
@@ -87,6 +108,25 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
                 joinedBookCategory.get("name")
         );
 
-        return entityManager.createQuery(query).getResultList();
+        TypedQuery<BookProjection> typedQuery = entityManager.createQuery(query);
+        typedQuery.setFirstResult((int) pageable.getOffset());
+        typedQuery.setMaxResults(pageable.getPageSize());
+
+        List<BookProjection> resultList = typedQuery.getResultList();
+
+        long totalRows = getTotalCount(builder, predicates);
+
+        return new PageImpl<>(resultList, pageable, totalRows);
+    }
+
+    private long getTotalCount(CriteriaBuilder builder, List<Predicate> predicates){
+        CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+        Root<Book> countRoot = countQuery.from(Book.class);
+
+        if(!predicates.isEmpty())
+            countQuery.where(predicates.toArray(new Predicate[0]));
+
+        countQuery.select(builder.count(countRoot));
+        return entityManager.createQuery(countQuery).getSingleResult();
     }
 }

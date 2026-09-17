@@ -51,7 +51,7 @@ public class BookService {
         return result;
     }
 
-    public List<Book> getByNameAndAuthor(String bookName, String author) {
+    public List<BookProjection> getByNameAndAuthor(String bookName, String author) {
         log.info("Fetching books with data: bookName={}, author={} ", bookName, author);
         var res = bookRepository.findByBookNameAndAuthor(bookName, author);
         log.debug("Number of fetched data {}", res.size());
@@ -59,19 +59,19 @@ public class BookService {
         return res;
     }
 
-    public List<Book> getByAuthor(String author) {
-        var res = bookRepository.findByAuthor(author);
-        log.debug("Number of fetched data {}", res.size());
-        log.info("Successfully get all data by author");
-        return res;
-    }
+//    public List<Book> getByAuthor(String author) {
+//        var res = bookRepository.findByAuthor(author);
+//        log.debug("Number of fetched data {}", res.size());
+//        log.info("Successfully get all data by author");
+//        return res;
+//    }
 
-    public List<BookProjection> getByBook(String bookName) {
-        var res = bookRepository.findByBookName(bookName);
-        log.debug("Number of fetched data {}", res.size());
-        log.info("Successfully get all data by author");
-        return res;
-    }
+//    public List<BookProjection> getByBook(String bookName) {
+//        var res = bookRepository.findByBookName(bookName);
+//        log.debug("Number of fetched data {}", res.size());
+//        log.info("Successfully get all data by author");
+//        return res;
+//    }
 
     public List<Book> addBook(BookRequest book) {
         log.info("Starting insert new book data");
@@ -192,11 +192,18 @@ public class BookService {
         return res;
     }
 
-    public List<BookProjection> getSearchDynamic(QueryKey key, String value) {
+    public Page<BookProjection> getSearchDynamic(
+            QueryKey key,
+            String value,
+            LocalDate minDate,
+            LocalDate maxDate,
+            int page,
+            int size,
+            String sortBy) {
         log.info("Starting get data book category dynamic method");
-
-        var res = bookRepository.findBookDynamic(key, value);
-        log.debug("Fetched data book : {}", res.size());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        var res = bookRepository.findBookDynamic(key, value, minDate, maxDate,pageable);
+        log.debug("Fetched data book : {}", res.getContent().size());
 
         log.info("Finish get data book with category dynamic method");
         return res;

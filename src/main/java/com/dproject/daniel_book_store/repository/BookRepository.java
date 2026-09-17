@@ -16,9 +16,9 @@ import java.util.List;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, String>, BookRepositoryCustom {
-    List<Book> findByBookNameAndAuthor(String book_name, String author);
+    List<BookProjection> findByBookNameAndAuthor(String book_name, String author);
     List<BookProjection> findByBookName(String book_name);
-    List<Book> findByAuthor(String author);
+    List<BookProjection> findByAuthor(String author);
 
     @Query("SELECT b FROM Book AS b WHERE " +
             "(CAST(:minDate AS TIMESTAMP) IS NULL OR b.create_date >= :minDate) AND " + "(CAST(:maxDate AS TIMESTAMP) IS NULL OR b.create_date <= :maxDate)")

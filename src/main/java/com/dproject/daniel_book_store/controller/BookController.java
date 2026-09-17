@@ -13,6 +13,7 @@ import com.dproject.daniel_book_store.service.manager.BookServiceManager;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,20 +29,20 @@ public class BookController {
     private final BookService bookService;
     private final BookServiceManager bookServiceManager;
 
-    @GetMapping("/book")
-    public ResponseEntity<OutputSchema<Page<BookProjection>>> getAllBookData(
-            @RequestParam(required = false, defaultValue = "") LocalDate minDate,
-            @RequestParam(required = false, defaultValue = "") LocalDate maxDate,
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "3") int size,
-            @RequestParam(required = false, defaultValue = "bookName") String sortBy){
-        return ResponseEntity.ok(OutputSchema.success(bookService.getAllDataBook(minDate, maxDate, page, size, sortBy), "Success get all book data"));
-    }
-
-    @PostMapping("/get")
-    public ResponseEntity<OutputSchema<List<Book>>> getByRequirement(@RequestParam String book_name, @RequestParam String author){
-        return ResponseEntity.ok(OutputSchema.success(bookService.getByNameAndAuthor(book_name, author), "Success get book data by book name & author"));
-    }
+//    @GetMapping("/book")
+//    public ResponseEntity<OutputSchema<Page<BookProjection>>> getAllBookData(
+//            @RequestParam(required = false, defaultValue = "") LocalDate minDate,
+//            @RequestParam(required = false, defaultValue = "") LocalDate maxDate,
+//            @RequestParam(required = false, defaultValue = "0") int page,
+//            @RequestParam(required = false, defaultValue = "3") int size,
+//            @RequestParam(required = false, defaultValue = "bookName") String sortBy){
+//        return ResponseEntity.ok(OutputSchema.success(bookService.getAllDataBook(minDate, maxDate, page, size, sortBy), "Success get all book data"));
+//    }
+//
+//    @PostMapping("/get")
+//    public ResponseEntity<OutputSchema<List<BookProjection>>> getByRequirement(@RequestParam String book_name, @RequestParam String author){
+//        return ResponseEntity.ok(OutputSchema.success(bookService.getByNameAndAuthor(book_name, author), "Success get book data by book name & author"));
+//    }
 
 //    @PostMapping("/getBook")
 //    public ResponseEntity<List<Book>> getByBook(@RequestParam String book_name){
@@ -53,20 +54,20 @@ public class BookController {
 //        return bookService.getByAuthor(author);
 //    }
 
-    @GetMapping("/getBook/{book_name}")
-    public ResponseEntity<OutputSchema<List<BookProjection>>> getByBook(@PathVariable String book_name){
-        return ResponseEntity.ok(OutputSchema.success(bookService.getByBook(book_name),"Success get book by name"));
-    }
+//    @GetMapping("/getBook/{book_name}")
+//    public ResponseEntity<OutputSchema<List<BookProjection>>> getByBook(@PathVariable String book_name){
+//        return ResponseEntity.ok(OutputSchema.success(bookService.getByBook(book_name),"Success get book by name"));
+//    }
+//
+//    @GetMapping("/getAuthor/{author}")
+//    public ResponseEntity<OutputSchema<List<Book>>> getByAuthor(@PathVariable String author){
+//        return ResponseEntity.ok(OutputSchema.success(bookService.getByAuthor(author), "Success get book by author"));
+//    }
 
-    @GetMapping("/getAuthor/{author}")
-    public ResponseEntity<OutputSchema<List<Book>>> getByAuthor(@PathVariable String author){
-        return ResponseEntity.ok(OutputSchema.success(bookService.getByAuthor(author), "Success get book by author"));
-    }
-
-    @GetMapping("/getId/{id}")
-    public ResponseEntity<OutputSchema<Book>> getBookById(@PathVariable String id){
-        return ResponseEntity.ok(OutputSchema.success(bookService.getBookById(id), "Successfully retrieved book"));
-    }
+//    @GetMapping("/getId/{id}")
+//    public ResponseEntity<OutputSchema<Book>> getBookById(@PathVariable String id){
+//        return ResponseEntity.ok(OutputSchema.success(bookService.getBookById(id), "Successfully retrieved book"));
+//    }
 
 //    @PostMapping("/insert-book")
 //    public ResponseEntity<OutputSchema<List<Book>>> insertData(@RequestBody @Valid BookRequest bookReq){
@@ -89,10 +90,10 @@ public class BookController {
         return ResponseEntity.ok(OutputSchema.success(bookServiceManager.updateBookCategory(id, bookRequest), "Successfully update data"));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<OutputSchema<Book>> deleteData(@PathVariable String id){
-        return ResponseEntity.ok(OutputSchema.success(bookService.deleteBook(id),"Successfully delete data"));
-    }
+//    @DeleteMapping("/delete/{id}")
+//    public ResponseEntity<OutputSchema<Book>> deleteData(@PathVariable String id){
+//        return ResponseEntity.ok(OutputSchema.success(bookService.deleteBook(id),"Successfully delete data"));
+//    }
 
     @GetMapping("/book-with-category")
     public ResponseEntity<OutputSchema<List<BookProjection>>> getBooksWithCategory(){
@@ -106,10 +107,21 @@ public class BookController {
     }
 
     @GetMapping("/dynamic-bookCat")
-    public ResponseEntity<OutputSchema<List<BookProjection>>> getBookByCatDynamic(
+    public ResponseEntity<OutputSchema<Page<BookProjection>>> getBookByCatDynamic(
             @RequestParam(required = false) QueryKey key,
-            @RequestParam(required = false) String value)
+            @RequestParam(required = false) String value,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate minDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate maxDate,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "3") int size,
+            @RequestParam(required = false, defaultValue = "bookName") String sortBy)
     {
-        return ResponseEntity.ok(OutputSchema.success(bookService.getSearchDynamic(key, value), "Successfully show book with category dynamic"));
+        Page<BookProjection> result = bookService.getSearchDynamic(key, value, minDate, maxDate, page, size, sortBy);
+        return ResponseEntity.ok(OutputSchema.success(result, "Successfully fetched books with dynamic criteria, date filter, and pagination"));
+    }
+
+    @DeleteMapping("/deleteBookCat/{id}")
+    public ResponseEntity<OutputSchema<BookProjection>> deleteData(@PathVariable String id){
+        return ResponseEntity.ok(OutputSchema.success(bookServiceManager.deleteBook(id),"Successfully delete data"));
     }
 }
